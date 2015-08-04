@@ -109,6 +109,10 @@ TerminalArea.prototype = {
   cursorBlur: function() {
     this.deactiveCursors();
     clearInterval(this.blinking);
+  },
+
+  contents: function() {
+    return this.$terminal.contents()[0];
   }
 }
 
