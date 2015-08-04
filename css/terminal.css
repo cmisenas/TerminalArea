@@ -1,0 +1,36 @@
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.terminal-area-container {
+  position: relative;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  font-family: 'Press Start 2P', monospace;
+  height: 200px;
+  width: 100%;
+  padding: 5px;
+  background-color: black;
+  color: white;
+  z-index: 0;
+}
+
+.terminal-area {
+  z-index: 2;
+}
+
+.terminal-area-cursor, .terminal-area-cursor-fake {
+  width: 1em;
+  height: 1em;
+  z-index: 1;
+}
+
+.terminal-area-cursor-fake {
+  position: absolute;
+}
+
+.terminal-area-cursor.active, .terminal-area-cursor-fake.active {
+  background-color: #626262;
+}
