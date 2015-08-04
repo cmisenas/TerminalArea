@@ -19,7 +19,7 @@ body {
 
 .terminal-area {
   z-index: 2;
-  white-space:pre;
+  white-space: pre-wrap;
 }
 
 .terminal-area-cursor, .terminal-area-cursor-fake {

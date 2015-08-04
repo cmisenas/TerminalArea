@@ -30,19 +30,8 @@ TerminalArea.prototype = {
     $(document).on('keypress', function(e) {
       console.log(e.keyCode);
       if (self.state) {
-        self.cursorBlur();
         self.type(String.fromCharCode(e.keyCode));
         self.setCurrentCursor(self.$cursorEl);
-      }
-    });
-
-    $(document).on('keydown', function(e) {
-      self.cursorBlur();
-    });
-
-    $(document).on('keyup', function(e) {
-      if (!$("input,textarea").is(":focus")) {
-        self.focus();
       }
     });
 
@@ -57,15 +46,14 @@ TerminalArea.prototype = {
 
   type: function(chr) {
     var currentTxt = this.$terminal.text();
-    var newTxt = currentTxt.split('');
     var formatChr = '';
     if (chr === ' ') {
       formatChr = '<span style="display: inline-block; width: 1em" class="terminal-area-cursor">' + chr + '</span>';
     } else {
       formatChr = '<span class="terminal-area-cursor">' + chr + '</span>';
     }
-    newTxt.splice(this.index, 0, formatChr);
-    this.$terminal.html(newTxt.join(''));
+    var newTxt = currentTxt.substr(0, this.index) + formatChr + currentTxt.substr(this.index);
+    this.$terminal.html(newTxt);
     this.$cursorEl = $('.terminal-area-cursor');
     this.forwardCursor();
   },
@@ -100,9 +88,10 @@ TerminalArea.prototype = {
 
   cursorBlink: function() {
     var self = this;
-    this.cursorBlur();
     this.blinking = setInterval(function() {
-      self.currentCursor.toggleClass('active');
+      if (self.state) {
+        self.currentCursor.toggleClass('active');
+      }
     }, 750);
   },
 
