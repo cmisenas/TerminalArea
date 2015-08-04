@@ -5,10 +5,7 @@ function TerminalArea(id) {
 
 TerminalArea.prototype = {
   init: function() {
-    // create cursor
-    // setup listeners for following events:
-    //   keypress ()
-    //   click (focusing in or out)
+    this.buffer = ' ';
     this.initCursor();
     this.$terminal = $('<div></div>').addClass('terminal-area');
     this.$el.append(this.$terminal);
@@ -28,10 +25,19 @@ TerminalArea.prototype = {
   initEvents: function() {
     var self = this;
     $(document).on('keypress', function(e) {
-      console.log(e.keyCode);
       if (self.state) {
         self.type(String.fromCharCode(e.keyCode));
-        self.setCurrentCursor(self.$cursorEl);
+      }
+    });
+
+    $(document).on('keydown', function(e) {
+      switch (e.keyCode) {
+        case 37: // left
+          self.backCursor();
+          break;
+        case 39:
+          self.forwardCursor();
+          break;
       }
     });
 
@@ -45,17 +51,29 @@ TerminalArea.prototype = {
   },
 
   type: function(chr) {
-    var currentTxt = this.$terminal.text();
+    this.setTextBuffer(chr); // inserts character in text buffer on current index
+    this.forwardCursor();
+  },
+
+  setTextBuffer: function(chr) {
+    this.buffer = this.buffer.substr(0, this.index) + chr + this.buffer.substr(this.index);
+  },
+
+  refreshCursor: function() {
     var formatChr = '';
+    var chr = this.buffer[this.index];
     if (chr === ' ') {
       formatChr = '<span style="display: inline-block; width: 1em" class="terminal-area-cursor">' + chr + '</span>';
     } else {
       formatChr = '<span class="terminal-area-cursor">' + chr + '</span>';
     }
-    var newTxt = currentTxt.substr(0, this.index) + formatChr + currentTxt.substr(this.index);
-    this.$terminal.html(newTxt);
+    this.setTxt(this.buffer.substr(0, this.index) + formatChr + this.buffer.substr(this.index + 1));
+  },
+
+  setTxt: function(txt) {
+    this.$terminal.html(txt);
     this.$cursorEl = $('.terminal-area-cursor');
-    this.forwardCursor();
+    this.setCurrentCursor(this.$cursorEl);
   },
 
   setCurrentCursor: function(el) {
@@ -69,11 +87,17 @@ TerminalArea.prototype = {
   },
 
   forwardCursor: function() {
-    this.index++;
+    if ((this.index) < this.buffer.length - 1) {
+      this.index++;
+    }
+    this.refreshCursor();
   },
 
   backCursor: function() {
-    this.index--;
+    if ((this.index) > 0) {
+      this.index--;
+    }
+    this.refreshCursor();
   },
 
   focus: function() {
@@ -101,7 +125,11 @@ TerminalArea.prototype = {
   },
 
   contents: function() {
-    return this.$terminal.contents()[0];
+    return this.$terminal.contents()
+                          .toArray()
+                          .reduce(function(prev, curr) {
+                            return prev + ((curr.nodeType === 1) ? curr.innerText : curr.wholeText);
+                          }, '');
   }
 }
 
