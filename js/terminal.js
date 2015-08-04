@@ -41,7 +41,17 @@ TerminalArea.prototype = {
     });
 
     $(document).on('keyup', function(e) {
-      self.focus();
+      if (!$("input,textarea").is(":focus")) {
+        self.focus();
+      }
+    });
+
+    $(document).on('click', function(e) {
+      if (!!$(e.target).closest('.terminal-area-container').length) {
+        self.focus();
+      } else {
+        self.blur();
+      }
     });
   },
 
@@ -61,9 +71,13 @@ TerminalArea.prototype = {
   },
 
   setCurrentCursor: function(el) {
+    this.deactiveCursors();
+    this.currentCursor = el;
+  },
+
+  deactiveCursors: function() {
     this.$fakeCursorEl.removeClass('active');
     if (this.$cursorEl) this.$cursorEl.removeClass('active');
-    this.currentCursor = el;
   },
 
   forwardCursor: function() {
@@ -93,6 +107,7 @@ TerminalArea.prototype = {
   },
 
   cursorBlur: function() {
+    this.deactiveCursors();
     clearInterval(this.blinking);
   }
 }
