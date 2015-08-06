@@ -38,6 +38,10 @@ TerminalArea.prototype = {
         case 39:
           self.forwardCursor();
           break;
+        case 8:
+          e.preventDefault();
+          self.deleteCurrent();
+          break;
       }
     });
 
@@ -55,19 +59,38 @@ TerminalArea.prototype = {
     this.forwardCursor();
   },
 
+  deleteCurrent: function() {
+    this.replaceTextBuffer('');
+    this.refreshCursor();
+  },
+
   setTextBuffer: function(chr) {
     this.buffer = this.buffer.substr(0, this.index) + chr + this.buffer.substr(this.index);
   },
 
+  replaceTextBuffer: function(chr) {
+    this.buffer = this.buffer.substr(0, this.index) + chr + this.buffer.substr(this.index + 1);
+  },
+
   refreshCursor: function() {
+    if (this.index >= this.buffer.length) {
+      this.index = (!!this.buffer) ? this.buffer.length - 1 : 0;
+    }
+    this.setTxt(this.formatTextBuffer());
+  },
+
+  formatTextBuffer: function() {
+    var chr = this.buffer[this.index] || '';
     var formatChr = '';
-    var chr = this.buffer[this.index];
-    if (chr === ' ') {
+    if (chr === '') {
+      this.setCurrentCursor(this.$fakeCursorEl);
+      return '';
+    } else if (chr === ' ') {
       formatChr = '<span style="display: inline-block; width: 1em" class="terminal-area-cursor">' + chr + '</span>';
     } else {
       formatChr = '<span class="terminal-area-cursor">' + chr + '</span>';
     }
-    this.setTxt(this.buffer.substr(0, this.index) + formatChr + this.buffer.substr(this.index + 1));
+    return this.buffer.substr(0, this.index) + formatChr + this.buffer.substr(this.index + 1);
   },
 
   setTxt: function(txt) {

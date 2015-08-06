@@ -8,5 +8,5 @@ Like a `<textarea>` that looks and behaves like your terminal.
 TODO:
 
 + [x] Detect arrow keys
-+ [ ] Delete using backspace
++ [x] Delete using backspace
 + [ ] Enter key creates newline
